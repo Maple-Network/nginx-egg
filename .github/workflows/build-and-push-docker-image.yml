@@ -53,7 +53,7 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             # Tag with the specific version number you provided
-            type=raw,value=${{ github.event.inputs.php_version }}
+            type=raw,value=php-${{ github.event.inputs.php_version }}
             # Optionally, tag as 'latest' if you selected the checkbox
             type=raw,value=latest,enable=${{ github.event.inputs.tag_as_latest }}
 
