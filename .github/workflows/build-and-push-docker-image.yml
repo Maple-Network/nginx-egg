@@ -1,0 +1,80 @@
+name: Build and Push Docker Image to Github (Manual Trigger)
+
+on:
+  workflow_dispatch:
+    inputs:
+      php_version:
+        description: 'The PHP version to build (e.g., 8.0). Must match a folder name in /images.'
+        required: true
+        type: string
+      tag_as_latest:
+        description: "Tag this build as 'latest' as well?"
+        required: true
+        type: boolean
+        default: false
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # The single job for building, pushing, and signing the specified image.
+  build_and_push:
+    # The job name is now dynamic based on your input.
+    name: Build PHP ${{ github.event.inputs.php_version }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@59acb6260d9c0ba8f4a2f9d9b48431a222b68e20 #v3.5.0
+        with:
+          cosign-release: 'v2.2.4'
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@f95db51fddba0c2d1ec667646a06c2ce06100226 # v3.0.0
+
+      - name: Log into GitHub Container Registry
+        uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # This step generates the tags based on your inputs.
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@96383f45573cb7f253c731d3b3ab81c87ef81934 # v5.0.0
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            # Tag with the specific version number you provided
+            type=raw,value=${{ github.event.inputs.php_version }}
+            # Optionally, tag as 'latest' if you selected the checkbox
+            type=raw,value=latest,enable=${{ github.event.inputs.tag_as_latest }}
+
+      - name: Build and push Docker image
+        id: build-and-push
+        uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # v5.0.0
+        with:
+          # The context points to the specific version folder you entered.
+          context: images/${{ github.event.inputs.php_version }}
+          push: true
+          # The tags are taken from the metadata step above.
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Sign the published Docker image
+        env:
+          DIGEST: ${{ steps.build-and-push.outputs.digest }}
+          TAGS: ${{ steps.meta.outputs.tags }}
+        # This command signs all tags associated with the image digest.
+        run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
