@@ -1,7 +1,9 @@
+ARG PHP=8
+
 FROM alpine:3.16
 
 RUN apk --update --no-cache add curl ca-certificates nginx
-RUN apk add php8 php8-xml php8-exif php8-fpm php8-session php8-soap php8-openssl php8-gmp php8-pdo_odbc php8-json php8-dom php8-pdo php8-zip php8-mysqli php8-sqlite3 php8-pdo_pgsql php8-bcmath php8-gd php8-odbc php8-pdo_mysql php8-pdo_sqlite php8-gettext php8-xmlreader php8-bz2 php8-iconv php8-pdo_dblib php8-curl php8-ctype php8-phar php8-fileinfo php8-mbstring php8-tokenizer php8-simplexml php8-intl php8-pecl-imagick
+RUN apk add php${PHP} php${PHP}-xml php${PHP}-exif php${PHP}-fpm php${PHP}-session php${PHP}-soap php${PHP}-openssl php${PHP}-gmp php${PHP}-pdo_odbc php${PHP}-json php${PHP}-dom php${PHP}-pdo php${PHP}-zip php${PHP}-mysqli php${PHP}-sqlite3 php${PHP}-pdo_pgsql php${PHP}-bcmath php${PHP}-gd php${PHP}-odbc php${PHP}-pdo_mysql php${PHP}-pdo_sqlite php${PHP}-gettext php${PHP}-xmlreader php${PHP}-bz2 php${PHP}-iconv php${PHP}-pdo_dblib php${PHP}-curl php${PHP}-ctype php${PHP}-phar php${PHP}-fileinfo php${PHP}-mbstring php${PHP}-tokenizer php${PHP}-simplexml php${PHP}-intl php${PHP}-pecl-imagick
 COPY --from=composer:latest  /usr/bin/composer /usr/bin/composer
 
 USER container
