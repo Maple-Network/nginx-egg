@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       php_version:
-        description: 'The PHP version to build (e.g., 8.0). Must match a folder name in /images.'
+        description: 'The PHP version to build (e.g., 8.3). Must match a folder name in /images.'
         required: true
         type: string
       tag_as_latest:
@@ -18,9 +18,7 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  # The single job for building, pushing, and signing the specified image.
   build_and_push:
-    # The job name is now dynamic based on your input.
     name: Build PHP ${{ github.event.inputs.php_version }}
     runs-on: ubuntu-latest
     permissions:
@@ -63,8 +61,10 @@ jobs:
         id: build-and-push
         uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # v5.0.0
         with:
-          # The context points to the specific version folder you entered.
-          context: images/${{ github.event.inputs.php_version }}
+          # Set the context to the repository root to access the entrypoint.sh
+          context: .
+          # Explicitly specify the path to the Dockerfile for the selected version
+          file: images/${{ github.event.inputs.php_version }}/Dockerfile
           push: true
           # The tags are taken from the metadata step above.
           tags: ${{ steps.meta.outputs.tags }}
