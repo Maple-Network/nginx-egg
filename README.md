@@ -17,3 +17,10 @@ To remove logs from console, open nginx/conf.d/default.conf and uncomment (remov
 #access_log /home/container/access.log;
 #error_log  /home/container/error.log error
 ```
+
+## Updating (for myself)
+
+- Supported PHP versions: https://www.php.net/supported-versions.php
+- Alpine PHP extensions: https://pkgs.alpinelinux.org/packages?name=php8-*&branch=edge&repo=&arch=x86_64&origin=&flagged=&maintainer=
+- WordPress PHP versions: https://make.wordpress.org/core/handbook/references/php-compatibility-and-wordpress-versions/
+- Required WordPress PHP extensions: https://make.wordpress.org/hosting/handbook/server-environment/#php-extensions
