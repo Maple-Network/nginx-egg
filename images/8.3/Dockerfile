@@ -46,7 +46,8 @@ RUN apk --update --no-cache add \
     php83-xmlreader \
     php83-pecl-ssh2 \
     php83-ftp \
-    php83-sockets
+    php83-sockets \
+    php83-gd
 
 COPY --from=composer:latest  /usr/bin/composer /usr/bin/composer
 
