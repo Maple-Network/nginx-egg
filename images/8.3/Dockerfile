@@ -35,6 +35,7 @@ RUN apk --update --no-cache add \
     php83-pecl-memcached \
     php83-opcache \
     php83-pecl-redis \
+    php83-ctype \
     \
     # Optional & Compatibility Extensions
     php83-pecl-timezonedb \
